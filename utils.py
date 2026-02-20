@@ -1,6 +1,8 @@
 from PySide6.QtWidgets import QMessageBox
 from PySide6 import QtWidgets, QtGui
-import sys, os
+import sys
+import os
+
 
 class IntOnlyDelegate(QtWidgets.QStyledItemDelegate):
     def createEditor(self, parent, option, index):
@@ -11,10 +13,10 @@ class IntOnlyDelegate(QtWidgets.QStyledItemDelegate):
             editor.setValidator(validator)
         return editor
 
+
 def check_and_process_matrix(self, table):
     """
     Проверяет заполненность матрицы и выводит предупреждение, если матрица неполная.
-    Если матрица заполнена, выполняет нужную операцию (например, task1).
     """
     # Проверяем заполненность таблицы
     rows = table.rowCount()
@@ -27,7 +29,7 @@ def check_and_process_matrix(self, table):
                 # Нашли пустую ячейку
                 QMessageBox.warning(
                     self, "Внимание", "Необходимо заполнить все ячейки матрицы.")
-                return
+                return False
     return True
 
 
@@ -46,12 +48,17 @@ def extract_matrix_from_table(table):
         for c in range(cols):
             item = table.item(r, c)
             if item is not None:
-                try:
+                if item.text().find('/') != -1:
+                    matrix[r][c] = float(
+                        int(item.text()[0]) / int(item.text()[2]))
+                elif item.text().find('.') != -1 or item.text().find(',') != -1:
+                    matrix[r][c] = float(item.text().replace(',', '.'))
+                else:
                     matrix[r][c] = int(item.text())
-                except:
-                    matrix[r][c] = float(int(item.text()[0]) / int(item.text()[2]))
+                    
 
     return matrix
+
 
 def resource_path(relative_path):
     """
